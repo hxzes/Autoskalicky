@@ -72,4 +72,3 @@ Webová stránka pre firmu Auto Skalický slúži na prezentáciu ponuky vozidie
 
 © 2024 Auto Skalický. Všetky práva vyhradené.
 Vytvoril [HAZE](https://haze.sk)Design
-

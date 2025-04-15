@@ -1,6 +1,5 @@
 "use client"
 
-import { Cars } from "@/components/cars"
 import { FeaturedCar } from "@/components/featured-car"
 import { Footer } from "@/components/footer"
 import { Header } from "@/components/header"
@@ -14,6 +13,8 @@ import { FinancingSection } from "@/components/financing-section"
 import { ServicesSection } from "@/components/services-section"
 import { FaqSection } from "@/components/faq-section"
 import { ScrollAnimation } from "@/components/scroll-animation"
+// Import nový komponent namiesto Cars
+import { FeaturedAutobazar } from "@/components/featured-autobazar"
 
 export default function Home() {
   return (
@@ -43,7 +44,8 @@ export default function Home() {
           </ScrollAnimation>
 
           <ScrollAnimation delay={500}>
-            <Cars />
+            {/* Použijeme nový komponent namiesto Cars */}
+            <FeaturedAutobazar />
           </ScrollAnimation>
 
           <ScrollAnimation delay={600}>
@@ -67,4 +69,3 @@ export default function Home() {
     </div>
   )
 }
-

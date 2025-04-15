@@ -76,8 +76,19 @@ export function FeaturedCar() {
                     </span>
                   )}
                 </div>
-                <Button asChild size="sm">
-                  <Link href={`/vozidla/${vehicle.id}`}>Detail</Link>
+                <Button
+                  asChild
+                  size="sm"
+                  className="sm:px-4 px-5 py-2 h-auto min-w-[80px] text-sm sm:text-sm touch-manipulation"
+                >
+                  <a
+                    href="https://auto-skalicky-s-r-o.autobazar.sk/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center"
+                  >
+                    Detail
+                  </a>
                 </Button>
               </div>
             </div>
@@ -87,4 +98,3 @@ export function FeaturedCar() {
     </div>
   )
 }
-

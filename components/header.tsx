@@ -139,7 +139,7 @@ export function Header() {
                     <NavigationMenuLink asChild>
                       <a
                         className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground"
-                        href="/vozidla?typ=osobne"
+                        href="/vozidla?category=osobne"
                       >
                         <div className="text-sm font-medium leading-none">Osobné vozidlá</div>
                         <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
@@ -152,7 +152,7 @@ export function Header() {
                     <NavigationMenuLink asChild>
                       <a
                         className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground"
-                        href="/vozidla?typ=suv"
+                        href="/vozidla?category=suv"
                       >
                         <div className="text-sm font-medium leading-none">SUV a crossovery</div>
                         <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
@@ -165,7 +165,7 @@ export function Header() {
                     <NavigationMenuLink asChild>
                       <a
                         className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground"
-                        href="/vozidla?typ=kombi"
+                        href="/vozidla?category=kombi"
                       >
                         <div className="text-sm font-medium leading-none">Kombi</div>
                         <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
@@ -219,4 +219,3 @@ export function Header() {
     </header>
   )
 }
-

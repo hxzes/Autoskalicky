@@ -27,4 +27,3 @@ export function getLogoImage(size: "small" | "medium" | "large" = "medium") {
   const { width, height } = dimensions[size]
   return getPlaceholderImage("Logo", width, height)
 }
-

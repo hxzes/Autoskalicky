@@ -41,4 +41,3 @@ generateFavicons().catch(console.error);
 
 // This is just a placeholder file to show the concept
 // In a real project, you would create actual favicon files
-

@@ -1,6 +1,6 @@
 "use client"
 
-import { createContext, useContext, useState, type ReactNode, useEffect, Suspense } from "react"
+import { createContext, useContext, useState, type ReactNode, useEffect } from "react"
 import { usePathname } from "next/navigation"
 import Loading from "@/app/loading"
 
@@ -16,45 +16,15 @@ export function useNavigation() {
   return useContext(NavigationContext)
 }
 
-// Separate component that uses useSearchParams to avoid the error
-function NavigationStateManager({
-  children,
-  onNavigationComplete,
-}: {
-  children: ReactNode
-  onNavigationComplete: () => void
-}) {
-  const pathname = usePathname()
-  const [prevPathname, setPrevPathname] = useState("")
-
-  // Handle navigation between pages
-  useEffect(() => {
-    // Skip the first render
-    if (prevPathname === "") {
-      setPrevPathname(pathname)
-      onNavigationComplete()
-      return
-    }
-
-    // Check if the path changed
-    if (prevPathname !== pathname) {
-      setPrevPathname(pathname)
-      // We don't show loading on navigation anymore
-      onNavigationComplete()
-    }
-  }, [pathname, prevPathname, onNavigationComplete])
-
-  return <>{children}</>
-}
-
 export function NavigationProvider({ children }: { children: ReactNode }) {
   const [isNavigating, setIsNavigating] = useState(true)
+  const [prevPathname, setPrevPathname] = useState("")
   const pathname = usePathname()
 
-  // Only show loading on the homepage (root path)
+  // Len zobraziť načítavanie na domovskej stránke (root path)
   const isHomepage = pathname === "/"
 
-  // Handle initial page load
+  // Spracovanie počiatočného načítania stránky
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsNavigating(false)
@@ -63,17 +33,25 @@ export function NavigationProvider({ children }: { children: ReactNode }) {
     return () => clearTimeout(timer)
   }, [])
 
-  const handleNavigationComplete = () => {
-    setIsNavigating(false)
-  }
+  // Spracovanie navigácie medzi stránkami
+  useEffect(() => {
+    // Preskočiť prvé renderovanie
+    if (prevPathname === "") {
+      setPrevPathname(pathname)
+      return
+    }
+
+    // Kontrola, či sa zmenila cesta
+    if (prevPathname !== pathname) {
+      setPrevPathname(pathname)
+      // Nezobrazujeme načítavanie pri navigácii
+    }
+  }, [pathname, prevPathname])
 
   return (
     <NavigationContext.Provider value={{ isNavigating }}>
-      <Suspense fallback={null}>
-        <NavigationStateManager onNavigationComplete={handleNavigationComplete}>{children}</NavigationStateManager>
-      </Suspense>
+      {children}
       {isNavigating && isHomepage && <Loading />}
     </NavigationContext.Provider>
   )
 }
-

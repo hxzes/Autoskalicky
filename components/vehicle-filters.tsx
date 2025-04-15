@@ -4,58 +4,49 @@ import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { Slider } from "@/components/ui/slider"
-import { useState } from "react"
-import { vehicles } from "@/lib/data"
+import { useState, useEffect, useRef } from "react"
+import type { Vehicle } from "@/lib/data"
 
-// Define filter state type
-export type VehicleFilters = {
-  brands: string[]
-  categories: string[]
-  fuels: string[]
-  transmissions: string[]
-  priceRange: [number, number]
-  yearRange: [number, number]
-  kmRange: [number, number]
-}
-
-// Define props type
 type VehicleFiltersProps = {
-  onFiltersChange: (filters: VehicleFilters) => void
+  initialVehicles: Vehicle[]
+  onFilterChange: (filteredVehicles: Vehicle[]) => void
   onReset: () => void
 }
 
-export function VehicleFilters({ onFiltersChange, onReset }: VehicleFiltersProps) {
-  // Extract unique brands from the actual vehicle data
+export function VehicleFilters({ initialVehicles, onFilterChange, onReset }: VehicleFiltersProps) {
+  // Extrakcia unikátnych značiek z aktuálnych dát vozidiel
   const uniqueBrands = Array.from(
     new Set(
-      vehicles.map((vehicle) => {
-        // Extract brand from the title (assuming the first word is the brand)
+      initialVehicles.map((vehicle) => {
+        // Extrakcia značky z názvu (predpokladáme, že prvé slovo je značka)
         const brand = vehicle.title.split(" ")[0]
         return brand
       }),
     ),
   ).sort()
 
-  // Extract unique categories (simplified for demo)
+  // Extrakcia unikátnych kategórií (zjednodušené pre demo)
   const categories = ["Sedan", "SUV", "Kombi", "Hatchback", "MPV"]
 
-  // Extract unique fuels
-  const fuels = Array.from(new Set(vehicles.map((v) => v.fuel))).sort()
+  // Extrakcia unikátnych palív
+  const fuels = Array.from(new Set(initialVehicles.map((v) => v.fuel))).sort()
 
-  // Extract unique transmissions
+  // Extrakcia unikátnych prevodoviek
   const transmissions = Array.from(
-    new Set(vehicles.map((v) => (v.transmission.includes("automat") ? "Automatická" : "Manuálna"))),
+    new Set(
+      initialVehicles.map((v) => (v.transmission && v.transmission.includes("automat") ? "Automatická" : "Manuálna")),
+    ),
   ).sort()
 
-  // Get min/max values for ranges
-  const minPrice = Math.min(...vehicles.map((v) => v.price.withVat))
-  const maxPrice = Math.max(...vehicles.map((v) => v.price.withVat))
-  const minYear = Math.min(...vehicles.map((v) => v.year))
-  const maxYear = Math.max(...vehicles.map((v) => v.year))
-  const minKm = Math.min(...vehicles.map((v) => v.mileage))
-  const maxKm = Math.max(...vehicles.map((v) => v.mileage))
+  // Získanie min/max hodnôt pre rozsahy
+  const minPrice = Math.min(...initialVehicles.map((v) => v.price.withVat))
+  const maxPrice = Math.max(...initialVehicles.map((v) => v.price.withVat))
+  const minYear = Math.min(...initialVehicles.filter((v) => v.year > 0).map((v) => v.year))
+  const maxYear = Math.max(...initialVehicles.filter((v) => v.year > 0).map((v) => v.year))
+  const minKm = Math.min(...initialVehicles.filter((v) => v.mileage > 0).map((v) => v.mileage))
+  const maxKm = Math.max(...initialVehicles.filter((v) => v.mileage > 0).map((v) => v.mileage))
 
-  // Initialize state for all filters
+  // Inicializácia stavu pre všetky filtre
   const [selectedBrands, setSelectedBrands] = useState<string[]>([])
   const [selectedCategories, setSelectedCategories] = useState<string[]>([])
   const [selectedFuels, setSelectedFuels] = useState<string[]>([])
@@ -64,8 +55,107 @@ export function VehicleFilters({ onFiltersChange, onReset }: VehicleFiltersProps
   const [yearRange, setYearRange] = useState<[number, number]>([minYear, maxYear])
   const [kmRange, setKmRange] = useState<[number, number]>([minKm, maxKm])
 
-  // Handle brand checkbox changes
+  // Použitie ref na sledovanie, či sa filtre zmenili
+  const filtersChanged = useRef(false)
+
+  // Pomocná funkcia na filtrovanie vozidiel
+  const filterVehicles = () => {
+    const filtered = initialVehicles.filter((vehicle) => {
+      // Filter značky
+      if (selectedBrands.length > 0) {
+        const vehicleBrand = vehicle.title.split(" ")[0]
+        if (!selectedBrands.includes(vehicleBrand)) {
+          return false
+        }
+      }
+
+      // Filter kategórie (zjednodušené)
+      if (selectedCategories.length > 0) {
+        let matches = false
+        if (
+          selectedCategories.includes("SUV") &&
+          (vehicle.title.includes("Kuga") ||
+            vehicle.title.includes("Ateca") ||
+            vehicle.title.includes("3008") ||
+            vehicle.title.includes("5008"))
+        ) {
+          matches = true
+        }
+        if (
+          selectedCategories.includes("Kombi") &&
+          (vehicle.title.includes("Combi") || vehicle.title.includes("SW") || vehicle.title.includes("Variant"))
+        ) {
+          matches = true
+        }
+        if (
+          selectedCategories.includes("Sedan") &&
+          (vehicle.title.includes("Sedan") || vehicle.title.includes("Limousine"))
+        ) {
+          matches = true
+        }
+        if (selectedCategories.includes("MPV") && vehicle.title.includes("Galaxy")) {
+          matches = true
+        }
+        if (selectedCategories.includes("Hatchback") && vehicle.title.includes("C3")) {
+          matches = true
+        }
+        if (!matches && selectedCategories.length > 0) {
+          return false
+        }
+      }
+
+      // Filter paliva
+      if (selectedFuels.length > 0 && !selectedFuels.includes(vehicle.fuel)) {
+        return false
+      }
+
+      // Filter prevodovky
+      if (selectedTransmissions.length > 0) {
+        const transmissionType =
+          vehicle.transmission && vehicle.transmission.includes("automat") ? "Automatická" : "Manuálna"
+        if (!selectedTransmissions.includes(transmissionType)) {
+          return false
+        }
+      }
+
+      // Filter cenového rozsahu
+      if (vehicle.price.withVat < priceRange[0] || vehicle.price.withVat > priceRange[1]) {
+        return false
+      }
+
+      // Filter rozsahu rokov
+      if (vehicle.year > 0 && (vehicle.year < yearRange[0] || vehicle.year > yearRange[1])) {
+        return false
+      }
+
+      // Filter rozsahu kilometrov
+      if (vehicle.mileage > 0 && (vehicle.mileage < kmRange[0] || vehicle.mileage > kmRange[1])) {
+        return false
+      }
+
+      return true
+    })
+
+    return filtered
+  }
+
+  // Aplikácia filtrov pri ich zmene
+  useEffect(() => {
+    // Preskočiť prvé renderovanie, aby sme zabránili nekonečnej slučke
+    if (!filtersChanged.current) {
+      return
+    }
+
+    const filtered = filterVehicles()
+    onFilterChange(filtered)
+  }, [selectedBrands, selectedCategories, selectedFuels, selectedTransmissions, priceRange, yearRange, kmRange])
+
+  // Spracovanie zmeny značky
   const handleBrandChange = (brand: string, checked: boolean) => {
+    if (!filtersChanged.current) {
+      filtersChanged.current = true
+    }
+
     if (checked) {
       setSelectedBrands((prev) => [...prev, brand])
     } else {
@@ -73,8 +163,9 @@ export function VehicleFilters({ onFiltersChange, onReset }: VehicleFiltersProps
     }
   }
 
-  // Handle category checkbox changes
+  // Spracovanie zmeny kategórie
   const handleCategoryChange = (category: string, checked: boolean) => {
+    filtersChanged.current = true
     if (checked) {
       setSelectedCategories((prev) => [...prev, category])
     } else {
@@ -82,8 +173,9 @@ export function VehicleFilters({ onFiltersChange, onReset }: VehicleFiltersProps
     }
   }
 
-  // Handle fuel checkbox changes
+  // Spracovanie zmeny paliva
   const handleFuelChange = (fuel: string, checked: boolean) => {
+    filtersChanged.current = true
     if (checked) {
       setSelectedFuels((prev) => [...prev, fuel])
     } else {
@@ -91,8 +183,9 @@ export function VehicleFilters({ onFiltersChange, onReset }: VehicleFiltersProps
     }
   }
 
-  // Handle transmission checkbox changes
+  // Spracovanie zmeny prevodovky
   const handleTransmissionChange = (transmission: string, checked: boolean) => {
+    filtersChanged.current = true
     if (checked) {
       setSelectedTransmissions((prev) => [...prev, transmission])
     } else {
@@ -100,8 +193,24 @@ export function VehicleFilters({ onFiltersChange, onReset }: VehicleFiltersProps
     }
   }
 
-  // Reset all filters
+  const handlePriceRangeChange = (value: number[]) => {
+    filtersChanged.current = true
+    setPriceRange(value as [number, number])
+  }
+
+  const handleYearRangeChange = (value: number[]) => {
+    filtersChanged.current = true
+    setYearRange(value as [number, number])
+  }
+
+  const handleKmRangeChange = (value: number[]) => {
+    filtersChanged.current = true
+    setKmRange(value as [number, number])
+  }
+
+  // Reset všetkých filtrov
   const handleReset = () => {
+    filtersChanged.current = false
     setSelectedBrands([])
     setSelectedCategories([])
     setSelectedFuels([])
@@ -110,21 +219,6 @@ export function VehicleFilters({ onFiltersChange, onReset }: VehicleFiltersProps
     setYearRange([minYear, maxYear])
     setKmRange([minKm, maxKm])
     onReset()
-  }
-
-  // Apply filters
-  const handleApplyFilters = () => {
-    const filters: VehicleFilters = {
-      brands: selectedBrands,
-      categories: selectedCategories,
-      fuels: selectedFuels,
-      transmissions: selectedTransmissions,
-      priceRange,
-      yearRange,
-      kmRange,
-    }
-
-    onFiltersChange(filters)
   }
 
   return (
@@ -215,7 +309,7 @@ export function VehicleFilters({ onFiltersChange, onReset }: VehicleFiltersProps
           max={maxPrice}
           step={500}
           value={priceRange}
-          onValueChange={(value) => setPriceRange(value as [number, number])}
+          onValueChange={handlePriceRangeChange}
           className="mt-6"
         />
       </div>
@@ -229,7 +323,7 @@ export function VehicleFilters({ onFiltersChange, onReset }: VehicleFiltersProps
           max={maxYear}
           step={1}
           value={yearRange}
-          onValueChange={(value) => setYearRange(value as [number, number])}
+          onValueChange={handleYearRangeChange}
           className="mt-6"
         />
       </div>
@@ -243,17 +337,14 @@ export function VehicleFilters({ onFiltersChange, onReset }: VehicleFiltersProps
           max={maxKm}
           step={5000}
           value={kmRange}
-          onValueChange={(value) => setKmRange(value as [number, number])}
+          onValueChange={handleKmRangeChange}
           className="mt-6"
         />
       </div>
-      <Button className="w-full animate-fade-in" style={{ animationDelay: "1000ms" }} onClick={handleApplyFilters}>
-        Použiť filtre
-      </Button>
       <Button
         variant="outline"
         className="w-full animate-fade-in"
-        style={{ animationDelay: "1100ms" }}
+        style={{ animationDelay: "1000ms" }}
         onClick={handleReset}
       >
         Zrušiť filtre
@@ -261,4 +352,3 @@ export function VehicleFilters({ onFiltersChange, onReset }: VehicleFiltersProps
     </div>
   )
 }
-

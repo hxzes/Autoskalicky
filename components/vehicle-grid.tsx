@@ -5,130 +5,25 @@ import { Badge } from "@/components/ui/badge"
 import Image from "next/image"
 import Link from "next/link"
 import { Calendar, Fuel, Gauge, RouteIcon as Road } from "lucide-react"
-import { vehicles } from "@/lib/data"
-import { useState, useEffect } from "react"
-import type { VehicleFilters } from "./vehicle-filters"
-import { LoadingSpinner } from "./loading-spinner"
+import type { Vehicle } from "@/lib/data"
+import { memo } from "react"
 
 type VehicleGridProps = {
-  filters?: VehicleFilters
+  vehicles: Vehicle[]
+  currentPage: number
 }
 
-export function VehicleGrid({ filters }: VehicleGridProps) {
-  const [filteredVehicles, setFilteredVehicles] = useState(vehicles)
-  const [isLoading, setIsLoading] = useState(false)
+export const VehicleGrid = memo(function VehicleGrid({ vehicles, currentPage }: VehicleGridProps) {
+  const vehiclesPerPage = 6
 
-  // Apply filters when they change
-  useEffect(() => {
-    if (!filters) {
-      setFilteredVehicles(vehicles)
-      return
-    }
+  // Výpočet indexov pre stránkovanie
+  const startIndex = (currentPage - 1) * vehiclesPerPage
+  const endIndex = startIndex + vehiclesPerPage
 
-    setIsLoading(true)
+  // Získanie vozidiel pre aktuálnu stránku
+  const displayedVehicles = vehicles.slice(startIndex, endIndex)
 
-    // Use a flag to track if the component is still mounted
-    let isMounted = true
-
-    // Simulate loading delay for better UX
-    const timeoutId = setTimeout(() => {
-      if (!isMounted) return
-
-      const filtered = vehicles.filter((vehicle) => {
-        // Brand filter
-        if (filters.brands.length > 0) {
-          const vehicleBrand = vehicle.title.split(" ")[0]
-          if (!filters.brands.includes(vehicleBrand)) {
-            return false
-          }
-        }
-
-        // Category filter (simplified)
-        if (filters.categories.length > 0) {
-          let matches = false
-          if (
-            filters.categories.includes("SUV") &&
-            (vehicle.title.includes("Kuga") ||
-              vehicle.title.includes("Ateca") ||
-              vehicle.title.includes("3008") ||
-              vehicle.title.includes("5008"))
-          ) {
-            matches = true
-          }
-          if (
-            filters.categories.includes("Kombi") &&
-            (vehicle.title.includes("Combi") || vehicle.title.includes("SW") || vehicle.title.includes("Variant"))
-          ) {
-            matches = true
-          }
-          if (
-            filters.categories.includes("Sedan") &&
-            (vehicle.title.includes("Sedan") || vehicle.title.includes("Limousine"))
-          ) {
-            matches = true
-          }
-          if (filters.categories.includes("MPV") && vehicle.title.includes("Galaxy")) {
-            matches = true
-          }
-          if (filters.categories.includes("Hatchback") && vehicle.title.includes("C3")) {
-            matches = true
-          }
-          if (!matches && filters.categories.length > 0) {
-            return false
-          }
-        }
-
-        // Fuel filter
-        if (filters.fuels.length > 0 && !filters.fuels.includes(vehicle.fuel)) {
-          return false
-        }
-
-        // Transmission filter
-        const transmissionType = vehicle.transmission.includes("automat") ? "Automatická" : "Manuálna"
-        if (filters.transmissions.length > 0 && !filters.transmissions.includes(transmissionType)) {
-          return false
-        }
-
-        // Price range filter
-        if (vehicle.price.withVat < filters.priceRange[0] || vehicle.price.withVat > filters.priceRange[1]) {
-          return false
-        }
-
-        // Year range filter
-        if (vehicle.year < filters.yearRange[0] || vehicle.year > filters.yearRange[1]) {
-          return false
-        }
-
-        // Mileage range filter
-        if (vehicle.mileage < filters.kmRange[0] || vehicle.mileage > filters.kmRange[1]) {
-          return false
-        }
-
-        return true
-      })
-
-      if (isMounted) {
-        setFilteredVehicles(filtered)
-        setIsLoading(false)
-      }
-    }, 500)
-
-    // Cleanup function to prevent state updates after unmount
-    return () => {
-      isMounted = false
-      clearTimeout(timeoutId)
-    }
-  }, [filters])
-
-  if (isLoading) {
-    return (
-      <div className="flex justify-center py-12">
-        <LoadingSpinner />
-      </div>
-    )
-  }
-
-  if (filteredVehicles.length === 0) {
+  if (vehicles.length === 0) {
     return (
       <div className="text-center py-12 animate-fade-in">
         <h3 className="text-xl font-medium mb-2">Žiadne vozidlá sa nenašli</h3>
@@ -142,7 +37,7 @@ export function VehicleGrid({ filters }: VehicleGridProps) {
 
   return (
     <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-      {filteredVehicles.map((vehicle, index) => (
+      {displayedVehicles.map((vehicle, index) => (
         <div
           key={vehicle.id}
           className="group overflow-hidden rounded-lg border bg-background shadow-sm transition-all hover:shadow-md animate-fade-up"
@@ -208,5 +103,4 @@ export function VehicleGrid({ filters }: VehicleGridProps) {
       ))}
     </div>
   )
-}
-
+})
