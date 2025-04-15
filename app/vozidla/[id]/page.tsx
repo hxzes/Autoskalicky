@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Footer } from "@/components/footer"
 import { Header } from "@/components/header"
@@ -12,6 +12,7 @@ import { Loader2 } from "lucide-react"
 export default function VehicleDetailPage({ params }: { params: { id: string } }) {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [isMobile, setIsMobile] = useState(false)
 
   // Použijeme API endpoint pre detail vozidla
   const vehicleUrl = `https://www.autobazar.sk/api/inzerat/${params.id}/`
@@ -27,6 +28,19 @@ export default function VehicleDetailPage({ params }: { params: { id: string } }
     setIsLoading(false)
     setError("Nepodarilo sa načítať detail vozidla. Vozidlo možno už nie je v ponuke.")
   }
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+
+    checkMobile()
+    window.addEventListener("resize", checkMobile)
+
+    return () => {
+      window.removeEventListener("resize", checkMobile)
+    }
+  }, [])
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -76,8 +90,14 @@ export default function VehicleDetailPage({ params }: { params: { id: string } }
               <iframe
                 src={vehicleUrl}
                 width="100%"
-                height={1200}
-                style={{ border: "none", display: isLoading ? "none" : "block" }}
+                height={isMobile ? 800 : 1200}
+                style={{
+                  border: "none",
+                  display: isLoading ? "none" : "block",
+                  maxWidth: "100%",
+                  overflow: "auto",
+                  WebkitOverflowScrolling: "touch", // Lepšie scrollovanie na iOS
+                }}
                 onLoad={handleIframeLoad}
                 onError={handleIframeError}
                 title="Detail vozidla"
@@ -86,11 +106,11 @@ export default function VehicleDetailPage({ params }: { params: { id: string } }
             </div>
           </div>
 
-          <div className="mt-8 flex justify-center">
-            <Button asChild className="mr-4">
+          <div className="mt-8 flex flex-col sm:flex-row justify-center gap-4">
+            <Button asChild className="w-full sm:w-auto">
               <Link href="/kontakt">Dohodnite si stretnutie</Link>
             </Button>
-            <Button asChild variant="outline" className="gap-2">
+            <Button asChild variant="outline" className="gap-2 w-full sm:w-auto">
               <a href={`tel:${companyInfo.contact.phone.sales}`}>
                 <Phone className="h-4 w-4" />
                 {companyInfo.contact.phone.sales}

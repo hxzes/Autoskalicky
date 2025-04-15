@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Loader2, ExternalLink } from "lucide-react"
@@ -22,6 +22,22 @@ export function AutobazarIframe({
 }: AutobazarIframeProps) {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+
+    checkMobile()
+    window.addEventListener("resize", checkMobile)
+
+    return () => {
+      window.removeEventListener("resize", checkMobile)
+    }
+  }, [])
+
+  const dynamicHeight = isMobile ? Math.min(height, 500) : height
 
   // Použijeme presný API endpoint poskytnutý používateľom
   const autobazarUrl =
@@ -72,8 +88,14 @@ export function AutobazarIframe({
           <iframe
             src={autobazarUrl}
             width="100%"
-            height={height}
-            style={{ border: "none", display: isLoading ? "none" : "block" }}
+            height={dynamicHeight}
+            style={{
+              border: "none",
+              display: isLoading ? "none" : "block",
+              maxWidth: "100%",
+              overflow: "auto",
+              WebkitOverflowScrolling: "touch", // Lepšie scrollovanie na iOS
+            }}
             onLoad={handleIframeLoad}
             onError={handleIframeError}
             title="Autobazar.sk - Auto Skalický"
@@ -81,9 +103,11 @@ export function AutobazarIframe({
           />
 
           {/* Pridáme informačný panel na spodok iframe */}
-          <div className="absolute bottom-0 left-0 right-0 bg-background/90 backdrop-blur-sm p-4 border-t flex justify-between items-center">
-            <p className="text-sm">Pre zobrazenie detailu vozidla kliknite priamo na vozidlo v zozname.</p>
-            <Button asChild size="sm" variant="outline" className="gap-1">
+          <div className="absolute bottom-0 left-0 right-0 bg-background/90 backdrop-blur-sm p-2 sm:p-4 border-t flex flex-col sm:flex-row justify-between items-center gap-2">
+            <p className="text-xs sm:text-sm text-center sm:text-left">
+              Pre zobrazenie detailu vozidla kliknite priamo na vozidlo v zozname.
+            </p>
+            <Button asChild size="sm" variant="outline" className="gap-1 w-full sm:w-auto">
               <a href="https://auto-skalicky-s-r-o.autobazar.sk/" target="_blank" rel="noopener noreferrer">
                 Otvoriť na Autobazar
                 <ExternalLink className="h-3 w-3 ml-1" />
