@@ -1,4 +1,5 @@
 "use client"
+
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ChevronRight, Loader2, ExternalLink } from "lucide-react"
@@ -45,7 +46,7 @@ export function FeaturedAutobazar() {
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold md:text-3xl">Najnovšie vozidlá</h2>
         <a
-          href="https://auto-skalicky-s-r-o.autobazar.sk/"
+          href={autobazarWebUrl}
           target="_blank"
           rel="noopener noreferrer"
           className="text-primary hover:underline flex items-center"
@@ -94,24 +95,17 @@ export function FeaturedAutobazar() {
                 onLoad={handleIframeLoad}
                 onError={handleIframeError}
                 title="Autobazar.sk - Auto Skalický - Najnovšie vozidlá"
-                sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-top-navigation"
+                sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
                 scrolling="yes"
-              />
-
-              {/* Pridám prekrývajúcu vrstvu, ktorá zachytí kliknutia */}
-              <div
-                className="absolute inset-0 bg-transparent cursor-pointer"
-                onClick={() => window.open("https://auto-skalicky-s-r-o.autobazar.sk/", "_blank")}
-                aria-label="Kliknite pre zobrazenie detailov na Autobazar.sk"
               />
 
               {/* Pridáme informačný panel na spodok iframe */}
               <div className="absolute bottom-0 left-0 right-0 bg-background/90 backdrop-blur-sm p-2 sm:p-4 border-t flex flex-col sm:flex-row justify-between items-center gap-2">
                 <p className="text-xs sm:text-sm text-center sm:text-left">
-                  Pre zobrazenie všetkých vozidiel použite tlačidlo "Otvoriť na Autobazar".
+                  Pre zobrazenie všetkých vozidiel kliknite na tlačidlo "Otvoriť na Autobazar".
                 </p>
                 <Button asChild size="sm" variant="outline" className="gap-1 w-full sm:w-auto">
-                  <a href="https://auto-skalicky-s-r-o.autobazar.sk/" target="_blank" rel="noopener noreferrer">
+                  <a href={autobazarWebUrl} target="_blank" rel="noopener noreferrer">
                     Otvoriť na Autobazar
                     <ExternalLink className="h-3 w-3 ml-1" />
                   </a>

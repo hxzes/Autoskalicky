@@ -99,7 +99,7 @@ export function AutobazarIframe({
             onLoad={handleIframeLoad}
             onError={handleIframeError}
             title="Autobazar.sk - Auto Skalický"
-            sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-top-navigation"
+            sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
             scrolling="yes"
           />
 
@@ -109,7 +109,7 @@ export function AutobazarIframe({
               Pre zobrazenie detailu vozidla kliknite priamo na vozidlo v zozname.
             </p>
             <Button asChild size="sm" variant="outline" className="gap-1 w-full sm:w-auto">
-              <a href="https://auto-skalicky-s-r-o.autobazar.sk/" target="_blank" rel="noopener noreferrer">
+              <a href={autobazarWebUrl} target="_blank" rel="noopener noreferrer">
                 Otvoriť na Autobazar
                 <ExternalLink className="h-3 w-3 ml-1" />
               </a>
