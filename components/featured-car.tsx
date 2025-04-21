@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import Image from "next/image"
-import Link from "next/link"
 import { ChevronRight, Fuel, Calendar, RouteIcon as Road, Gauge } from "lucide-react"
 import { vehicles } from "@/lib/data"
 
@@ -15,10 +14,15 @@ export function FeaturedCar() {
     <div className="mt-16">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold md:text-3xl">Najnovšie vozidlá</h2>
-        <Link href="/vozidla" className="text-primary hover:underline flex items-center">
+        <a
+          href="https://auto-skalicky-s-r-o.autobazar.sk/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-primary hover:underline flex items-center"
+        >
           Zobraziť všetky
           <ChevronRight className="ml-1 h-4 w-4" />
-        </Link>
+        </a>
       </div>
       <div className="mt-6 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {featuredVehicles.map((vehicle) => (

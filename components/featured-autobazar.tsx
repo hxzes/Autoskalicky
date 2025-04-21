@@ -2,7 +2,6 @@
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ChevronRight, Loader2, ExternalLink } from "lucide-react"
-import Link from "next/link"
 import { Button } from "@/components/ui/button"
 
 export function FeaturedAutobazar() {
@@ -45,10 +44,15 @@ export function FeaturedAutobazar() {
     <div className="mt-16">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold md:text-3xl">Najnovšie vozidlá</h2>
-        <Link href="/vozidla" className="text-primary hover:underline flex items-center">
+        <a
+          href="https://auto-skalicky-s-r-o.autobazar.sk/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-primary hover:underline flex items-center"
+        >
           Zobraziť všetky
           <ChevronRight className="ml-1 h-4 w-4" />
-        </Link>
+        </a>
       </div>
       <div className="mt-6">
         <Card className="w-full">
@@ -84,13 +88,14 @@ export function FeaturedAutobazar() {
                   border: "none",
                   display: isLoading ? "none" : "block",
                   maxWidth: "100%",
-                  overflow: "auto",
+                  overflow: "visible",
                   WebkitOverflowScrolling: "touch", // Lepšie scrollovanie na iOS
                 }}
                 onLoad={handleIframeLoad}
                 onError={handleIframeError}
                 title="Autobazar.sk - Auto Skalický - Najnovšie vozidlá"
                 sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-top-navigation"
+                scrolling="yes"
               />
 
               {/* Pridám prekrývajúcu vrstvu, ktorá zachytí kliknutia */}

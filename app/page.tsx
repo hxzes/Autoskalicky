@@ -4,7 +4,6 @@ import { FeaturedCar } from "@/components/featured-car"
 import { Footer } from "@/components/footer"
 import { Header } from "@/components/header"
 import { Hero } from "@/components/hero"
-import { Search } from "@/components/search"
 import { Services } from "@/components/services"
 import { Stats } from "@/components/stats"
 import { Testimonials } from "@/components/testimonials"
@@ -23,10 +22,6 @@ export default function Home() {
       <main className="flex-1">
         <Hero />
         <div className="container mx-auto px-4 py-8 md:py-12 lg:px-8">
-          <ScrollAnimation>
-            <Search />
-          </ScrollAnimation>
-
           <ScrollAnimation delay={100}>
             <FeaturedCar />
           </ScrollAnimation>

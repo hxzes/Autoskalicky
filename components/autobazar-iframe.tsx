@@ -93,13 +93,14 @@ export function AutobazarIframe({
               border: "none",
               display: isLoading ? "none" : "block",
               maxWidth: "100%",
-              overflow: "auto",
+              overflow: "visible",
               WebkitOverflowScrolling: "touch", // Lepšie scrollovanie na iOS
             }}
             onLoad={handleIframeLoad}
             onError={handleIframeError}
             title="Autobazar.sk - Auto Skalický"
             sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-top-navigation"
+            scrolling="yes"
           />
 
           {/* Pridáme informačný panel na spodok iframe */}
